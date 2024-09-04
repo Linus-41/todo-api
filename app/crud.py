@@ -31,6 +31,11 @@ def get_todos(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_user_todo(db: Session, todo: schemas.ToDoCreate, user_id: int):
+    # Validate category ownership
+    if todo.category_id is not None:
+        category = get_category(db, todo.category_id)
+        if category is None or category.user_id != user_id:
+            raise HTTPException(status_code=400, detail="Invalid category_id: Category does not belong to the user")
 
     if todo.position is None:
         max_position = db.query(models.ToDo.position).filter_by(owner_id=user_id).order_by(
@@ -54,10 +59,48 @@ def update_todo(db: Session, todo: schemas.ToDoUpdate):
     db_todo = db.query(models.ToDo).filter(models.ToDo.id == todo.id).first()
     if not db_todo:
         raise HTTPException(status_code=404, detail="Todo was not found")
+
+    # Validate category ownership
+    if todo.category_id is not None:
+        category = get_category(db, todo.category_id)
+        if category is None or category.user_id != db_todo.owner_id:
+            raise HTTPException(status_code=400, detail="Invalid category_id: Category does not belong to the user")
+
     db_todo.title = todo.title
     db_todo.text = todo.text
     db_todo.is_done = todo.is_done
     db_todo.position = todo.position
+    db_todo.category_id = todo.category_id
     db.commit()
     db.refresh(db_todo)
     return db_todo
+
+
+def get_category(db: Session, category_id: int):
+    return db.query(models.Category).filter(models.Category.id == category_id).first()
+
+
+def create_user_category(db: Session, category: schemas.CategoryCreate, user_id: int):
+    db_category = models.Category(**category.dict(), user_id=user_id)
+    db.add(db_category)
+    db.commit()
+    db.refresh(db_category)
+    return db_category
+
+
+def delete_category(db: Session, category_id: int):
+    category = db.query(models.Category).filter(models.Category.id == category_id).first()
+    if category:
+        db.delete(category)
+        db.commit()
+
+
+def update_category(db: Session, category: schemas.CategoryUpdate):
+    db_category = db.query(models.Category).filter(models.Category.id == category.id).first()
+    if not db_category:
+        raise HTTPException(status_code=404, detail="Category was not found")
+    for key, value in category.model_dump().items():
+        setattr(db_category, key, value)
+    db.commit()
+    db.refresh(db_category)
+    return db_category

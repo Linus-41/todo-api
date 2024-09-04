@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class ToDoBase(BaseModel):
     title: str
     text: str | None = None
+    is_done: bool = False
 
 
 class ToDoCreate(ToDoBase):

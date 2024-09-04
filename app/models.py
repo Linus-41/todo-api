@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 
 from app.db import Base
@@ -30,6 +30,7 @@ class ToDo(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, index=True)
     text = Column(String, index=True)
+    is_done = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey("user.id"))
 
     owner = relationship("User", back_populates="todos")

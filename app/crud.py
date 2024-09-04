@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from . import models, schemas
@@ -38,7 +39,19 @@ def create_user_todo(db: Session, todo: schemas.ToDoCreate, user_id: int):
 
 
 def delete_todo(db: Session, todo_id: int):
-    todo_db = db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
-    db.delete(todo_db)
+    db_todo = db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
+    db.delete(db_todo)
     db.commit()
-    return todo_db
+    return db_todo
+
+
+def update_todo(db: Session, todo: schemas.ToDoUpdate):
+    db_todo = db.query(models.ToDo).filter(models.ToDo.id == todo.id).first()
+    if not db_todo:
+        raise HTTPException(status_code=404, detail="Todo was not found")
+    db_todo.title = todo.title
+    db_todo.text = todo.text
+    db_todo.is_done = todo.is_done
+    db.commit()
+    db.refresh(db_todo)
+    return db_todo

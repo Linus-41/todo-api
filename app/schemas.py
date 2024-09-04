@@ -11,6 +11,10 @@ class ToDoCreate(ToDoBase):
     pass
 
 
+class ToDoUpdate(ToDoBase):
+    id: int
+
+
 class ToDo(ToDoBase):
     id: int
     owner_id: int

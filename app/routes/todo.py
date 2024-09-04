@@ -38,3 +38,15 @@ def delete_todo(
 
     crud.delete_todo(db, todo_id)
     response.status_code = status.HTTP_204_NO_CONTENT
+
+
+@router.put("/")
+def update_todo(
+    todo: schemas.ToDoUpdate,
+    db: Session = Depends(get_db),
+    current_user: schemas.User = Depends(get_current_user)
+):
+    if todo.id not in [todo.id for todo in current_user.todos]:
+        raise HTTPException(status_code=404, detail="Todo was not found")
+
+    return crud.update_todo(db, todo)

@@ -5,6 +5,7 @@ class ToDoBase(BaseModel):
     title: str
     text: str | None = None
     is_done: bool = False
+    position: int | None = None
 
 
 class ToDoCreate(ToDoBase):

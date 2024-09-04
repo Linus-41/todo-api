@@ -31,6 +31,7 @@ class ToDo(Base):
     title = Column(String, index=True)
     text = Column(String, index=True)
     is_done = Column(Boolean, default=False)
+    position = Column(Integer)
     owner_id = Column(Integer, ForeignKey("user.id"))
 
     owner = relationship("User", back_populates="todos")

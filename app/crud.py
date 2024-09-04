@@ -31,6 +31,11 @@ def get_todos(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_user_todo(db: Session, todo: schemas.ToDoCreate, user_id: int):
+
+    if todo.position is None:
+        max_position = db.query(models.ToDo.position).filter_by(owner_id=user_id).order_by(
+            models.ToDo.position.desc()).first()
+        todo.position = (max_position[0] + 1) if max_position else 1
     db_todo = models.ToDo(**todo.model_dump(), owner_id=user_id)
     db.add(db_todo)
     db.commit()
@@ -52,6 +57,7 @@ def update_todo(db: Session, todo: schemas.ToDoUpdate):
     db_todo.title = todo.title
     db_todo.text = todo.text
     db_todo.is_done = todo.is_done
+    db_todo.position = todo.position
     db.commit()
     db.refresh(db_todo)
     return db_todo

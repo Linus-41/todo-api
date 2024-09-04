@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app import schemas, crud
@@ -23,3 +23,18 @@ def read_todos(
         current_user: schemas.User = Depends(get_current_user)
 ):
     return current_user.todos
+
+
+@router.delete("/{todo_id}")
+def delete_todo(
+        todo_id: int,
+        response: Response,
+        db: Session = Depends(get_db),
+        current_user: schemas.User = Depends(get_current_user),
+
+):
+    if todo_id not in [todo.id for todo in current_user.todos]:
+        raise HTTPException(status_code=404, detail="Todo was not found")
+
+    crud.delete_todo(db, todo_id)
+    response.status_code = status.HTTP_204_NO_CONTENT

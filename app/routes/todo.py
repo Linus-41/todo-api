@@ -80,3 +80,13 @@ def share_todo(
         raise HTTPException(status_code=403, detail="Not authorized to share this ToDo")
 
     return database.share_todo_with_user(db, todo_id, share_request.user_id)
+
+
+@router.patch("/{todo_id}/change_position")
+def change_user_todo_position(
+        todo_id: int,
+        todo: schemas.todo.ToDoUpdatePosition,
+        db: Session = Depends(get_db),
+        current_user: app.schemas.user.User = Depends(get_current_user),
+):
+    return database.update_todo_position(db, todo_id, todo.new_position)

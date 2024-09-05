@@ -23,11 +23,12 @@ def create_user_todo(db: Session, todo: app.schemas.todo.ToDoCreate, user_id: in
         if category is None or category.user_id != user_id:
             raise HTTPException(status_code=400, detail="Invalid category_id: Category does not belong to the user")
 
-    if todo.position is None:
-        max_position = db.query(app.models.todo.ToDo.position).filter_by(owner_id=user_id).order_by(
-            app.models.todo.ToDo.position.desc()).first()
-        todo.position = (max_position[0] + 1) if max_position else 1
     db_todo = app.models.todo.ToDo(**todo.model_dump(), owner_id=user_id)
+
+    max_position = db.query(app.models.todo.ToDo.position).filter_by(owner_id=user_id).order_by(
+        app.models.todo.ToDo.position.desc()).first()
+    db_todo.position = (max_position[0] + 1) if max_position else 1
+
     db.add(db_todo)
     db.commit()
     db.refresh(db_todo)
@@ -82,4 +83,35 @@ def share_todo_with_user(db: Session, todo_id: int, user_id: int):
 
     db_user.shared_todos.append(db_todo)
     db.commit()
+    return db_todo
+
+
+def update_todo_position(db: Session, todo_id: int, new_position: int):
+    db_todo = db.query(app.models.todo.ToDo).filter(app.models.todo.ToDo.id == todo_id).first()
+    if not db_todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+
+    owner_id = db_todo.owner_id
+
+    owner_todos = (
+        db.query(app.models.todo.ToDo)
+        .filter(app.models.todo.ToDo.owner_id == owner_id)
+        .order_by(app.models.todo.ToDo.position)
+        .all()
+    )
+
+    owner_todos.remove(db_todo)
+
+    if new_position < 1:
+        new_position = 1
+    elif new_position > len(owner_todos) + 1:
+        new_position = len(owner_todos) + 1
+
+    owner_todos.insert(new_position - 1, db_todo)
+
+    for idx, todo in enumerate(owner_todos):
+        todo.position = idx + 1
+
+    db.commit()
+    db.refresh(db_todo)
     return db_todo

@@ -20,6 +20,4 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 def read_current_user(
         current_user: schemas.User = Depends(get_current_user)
 ):
-    if current_user is None:
-        raise HTTPException(status_code=400, detail="Not logged in")
     return current_user

@@ -34,6 +34,7 @@ class ToDoCreate(ToDoBase):
 
 
 class ToDoUpdate(ToDoBase):
+    title: str | None = None
     id: int
 
 

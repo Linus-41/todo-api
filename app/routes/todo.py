@@ -40,7 +40,7 @@ def delete_user_todo(
     response.status_code = status.HTTP_204_NO_CONTENT
 
 
-@router.put("/")
+@router.put("/", response_model=schemas.ToDo)
 def update_user_todo(
     todo: schemas.ToDoUpdate,
     db: Session = Depends(get_db),
@@ -50,3 +50,15 @@ def update_user_todo(
         raise HTTPException(status_code=404, detail="Todo was not found")
 
     return crud.update_todo(db, todo)
+
+
+@router.patch("/mark_done/{todo_id}", response_model=schemas.ToDo)
+def mark_user_todo_done(
+    todo_id: int,
+    db: Session = Depends(get_db),
+    current_user: schemas.User = Depends(get_current_user)
+):
+    if todo_id not in [todo.id for todo in current_user.todos]:
+        raise HTTPException(status_code=404, detail="Todo was not found")
+
+    return crud.mark_todo_done(db, todo_id)

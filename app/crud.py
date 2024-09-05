@@ -66,11 +66,17 @@ def update_todo(db: Session, todo: schemas.ToDoUpdate):
         if category is None or category.user_id != db_todo.owner_id:
             raise HTTPException(status_code=400, detail="Invalid category_id: Category does not belong to the user")
 
-    db_todo.title = todo.title
-    db_todo.text = todo.text
-    db_todo.is_done = todo.is_done
-    db_todo.position = todo.position
-    db_todo.category_id = todo.category_id
+    for key, value in todo.model_dump().items():
+        if value is not None:
+            setattr(db_todo, key, value)
+    db.commit()
+    db.refresh(db_todo)
+    return db_todo
+
+
+def mark_todo_done(db: Session, todo_id: int):
+    db_todo = db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
+    db_todo.is_done = True
     db.commit()
     db.refresh(db_todo)
     return db_todo
@@ -100,7 +106,8 @@ def update_category(db: Session, category: schemas.CategoryUpdate):
     if not db_category:
         raise HTTPException(status_code=404, detail="Category was not found")
     for key, value in category.model_dump().items():
-        setattr(db_category, key, value)
+        if value is not None:
+            setattr(db_category, key, value)
     db.commit()
     db.refresh(db_category)
     return db_category

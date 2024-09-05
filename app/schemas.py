@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 
 
+# Category schemas
+
 class CategoryBase(BaseModel):
     name: str
 
@@ -20,6 +22,8 @@ class Category(CategoryBase):
     class Config:
         from_attributes = True
 
+
+# To-Do schemas
 
 class ToDoBase(BaseModel):
     title: str
@@ -45,6 +49,8 @@ class ToDo(ToDoBase):
     class Config:
         from_attributes = True
 
+
+# User schemas
 
 class UserBase(BaseModel):
     user_name: str

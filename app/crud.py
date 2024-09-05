@@ -5,6 +5,8 @@ from . import models, schemas
 from .security import get_password_hash
 
 
+# User operations
+
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
@@ -25,6 +27,8 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
+
+# To-Do operations
 
 def get_todo_by_id(db: Session, todo_id: int):
     return db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
@@ -103,12 +107,14 @@ def share_todo_with_user(db: Session, todo_id: int, user_id: int):
     return db_todo
 
 
+# Category operations
+
 def get_category(db: Session, category_id: int):
     return db.query(models.Category).filter(models.Category.id == category_id).first()
 
 
 def create_user_category(db: Session, category: schemas.CategoryCreate, user_id: int):
-    db_category = models.Category(**category.dict(), user_id=user_id)
+    db_category = models.Category(**category.model_dump(), user_id=user_id)
     db.add(db_category)
     db.commit()
     db.refresh(db_category)

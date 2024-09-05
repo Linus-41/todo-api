@@ -9,7 +9,7 @@ router = APIRouter(prefix="/todos", tags=["todos"])
 
 
 @router.post("/", response_model=schemas.ToDo)
-def create_todo_for_user(
+def create_user_todo(
         todo: schemas.ToDoCreate,
         db: Session = Depends(get_db),
         current_user: schemas.User = Depends(get_current_user)
@@ -19,14 +19,14 @@ def create_todo_for_user(
 
 
 @router.get("/", response_model=list[schemas.ToDo])
-def read_todos(
+def read_user_todos(
         current_user: schemas.User = Depends(get_current_user)
 ):
     return current_user.todos
 
 
 @router.delete("/{todo_id}")
-def delete_todo(
+def delete_user_todo(
         todo_id: int,
         response: Response,
         db: Session = Depends(get_db),
@@ -41,7 +41,7 @@ def delete_todo(
 
 
 @router.put("/")
-def update_todo(
+def update_user_todo(
     todo: schemas.ToDoUpdate,
     db: Session = Depends(get_db),
     current_user: schemas.User = Depends(get_current_user)

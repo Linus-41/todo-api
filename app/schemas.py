@@ -58,6 +58,12 @@ class User(UserBase):
     id: int
     todos: list[ToDo] = []
     categories: list[Category] = []
+    shared_todos: list[ToDo] = []
 
     class Config:
         from_attributes = True
+
+
+class ShareToDoRequest(BaseModel):
+    todo_id: int
+    user_id: int

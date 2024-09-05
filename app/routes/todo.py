@@ -22,7 +22,8 @@ def create_user_todo(
 def read_user_todos(
         current_user: schemas.User = Depends(get_current_user)
 ):
-    return current_user.todos
+    todos = current_user.todos + current_user.shared_todos
+    return todos
 
 
 @router.delete("/{todo_id}")
@@ -62,3 +63,16 @@ def mark_user_todo_done(
         raise HTTPException(status_code=404, detail="Todo was not found")
 
     return crud.mark_todo_done(db, todo_id)
+
+
+@router.post("/share", response_model=schemas.ToDo)
+def share_todo(
+        share_request: schemas.ShareToDoRequest,
+        db: Session = Depends(get_db),
+        current_user: schemas.User = Depends(get_current_user),
+):
+    db_todo = crud.get_todo_by_id(db, share_request.todo_id)
+    if db_todo.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to share this ToDo")
+
+    return crud.share_todo_with_user(db, share_request.todo_id, share_request.user_id)

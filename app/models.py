@@ -1,8 +1,15 @@
 from pydantic import BaseModel
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Table
 from sqlalchemy.orm import relationship
 
 from app.db import Base
+
+user_todo_share_association = Table(
+    'user_todo_share_association',
+    Base.metadata,
+    Column('user_id', Integer, ForeignKey('user.id')),
+    Column('todo_id', Integer, ForeignKey('todo.id'))
+)
 
 
 class Token(BaseModel):
@@ -22,8 +29,13 @@ class User(Base):
     hashed_password = Column(String)
 
     todos = relationship("ToDo", back_populates="owner")
+    shared_todos = relationship(
+        "ToDo",
+        secondary=user_todo_share_association,
+        back_populates="shared_with"
+    )
     categories = relationship("Category", back_populates="owner")
-    
+
 
 class ToDo(Base):
     __tablename__ = "todo"
@@ -37,6 +49,11 @@ class ToDo(Base):
     category_id = Column(Integer, ForeignKey("category.id"), nullable=True)
 
     owner = relationship("User", back_populates="todos")
+    shared_with = relationship(
+        "User",
+        secondary=user_todo_share_association,
+        back_populates="shared_todos"
+    )
     category = relationship("Category", back_populates="todos")
 
 

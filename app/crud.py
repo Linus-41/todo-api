@@ -26,6 +26,10 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 
+def get_todo_by_id(db: Session, todo_id: int):
+    return db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
+
+
 def get_todos(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.ToDo).offset(skip).limit(limit).all()
 
@@ -79,6 +83,23 @@ def mark_todo_done(db: Session, todo_id: int):
     db_todo.is_done = True
     db.commit()
     db.refresh(db_todo)
+    return db_todo
+
+
+def share_todo_with_user(db: Session, todo_id: int, user_id: int):
+    db_todo = db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+
+    if not db_todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if db_todo in db_user.shared_todos:
+        raise HTTPException(status_code=409, detail="Todo already shared!")
+
+    db_user.shared_todos.append(db_todo)
+    db.commit()
     return db_todo
 
 

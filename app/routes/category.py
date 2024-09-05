@@ -9,7 +9,7 @@ router = APIRouter(prefix="/categories", tags=["categories"])
 
 
 @router.post("/", response_model=schemas.Category)
-def create_category_for_user(
+def create_user_category(
         category: schemas.CategoryCreate,
         db: Session = Depends(get_db),
         current_user: schemas.User = Depends(get_current_user)
@@ -18,14 +18,14 @@ def create_category_for_user(
 
 
 @router.get("/", response_model=list[schemas.Category])
-def read_categories(
+def read_user_categories(
         current_user: schemas.User = Depends(get_current_user)
 ):
     return current_user.categories
 
 
 @router.delete("/{category_id}")
-def delete_category(
+def delete_user_category(
         category_id: int,
         response: Response,
         db: Session = Depends(get_db),
@@ -40,7 +40,7 @@ def delete_category(
 
 
 @router.put("/")
-def update_category(
+def update_user_category(
         category: schemas.CategoryUpdate,
         db: Session = Depends(get_db),
         current_user: schemas.User = Depends(get_current_user)

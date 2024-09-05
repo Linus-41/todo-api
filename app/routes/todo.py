@@ -56,7 +56,7 @@ def update_user_todo(
     return database.update_todo(db, todo)
 
 
-@router.patch("/mark_done/{todo_id}", response_model=app.schemas.todo.ToDo)
+@router.patch("/{todo_id}/mark_done", response_model=app.schemas.todo.ToDo)
 def mark_user_todo_done(
     todo_id: int,
     db: Session = Depends(get_db),
@@ -68,14 +68,15 @@ def mark_user_todo_done(
     return database.mark_todo_done(db, todo_id)
 
 
-@router.post("/share", response_model=app.schemas.todo.ToDo)
+@router.post("/{todo_id}/share", response_model=app.schemas.todo.ToDo)
 def share_todo(
+        todo_id: int,
         share_request: app.schemas.user.ShareToDoRequest,
         db: Session = Depends(get_db),
         current_user: app.schemas.user.User = Depends(get_current_user),
 ):
-    db_todo = database.get_todo_by_id(db, share_request.todo_id)
+    db_todo = database.get_todo_by_id(db, todo_id)
     if db_todo.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to share this ToDo")
 
-    return database.share_todo_with_user(db, share_request.todo_id, share_request.user_id)
+    return database.share_todo_with_user(db, todo_id, share_request.user_id)

@@ -23,5 +23,4 @@ class User(UserBase):
 
 
 class ShareToDoRequest(BaseModel):
-    todo_id: int
     user_id: int

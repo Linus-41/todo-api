@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
@@ -12,8 +14,24 @@ def get_todo_by_id(db: Session, todo_id: int):
     return db.query(app.models.todo.ToDo).filter(app.models.todo.ToDo.id == todo_id).first()
 
 
-def get_todos(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(app.models.todo.ToDo).offset(skip).limit(limit).all()
+def get_user_todos(
+        owner_id: int,
+        db: Session,
+        exclude_done: Optional[bool] = False,
+        exclude_shared: Optional[bool] = False,
+        skip: int = 0,
+        limit: int = 100,
+):
+    query = db.query(app.models.todo.ToDo).filter(app.models.todo.ToDo.owner_id == owner_id)
+
+    if exclude_done is True:
+        query = query.filter(app.models.todo.ToDo.is_done != exclude_done)
+
+    if exclude_shared is True:
+        query = query.filter(~app.models.todo.ToDo.shared_with.any())
+
+    todos = query.offset(skip).limit(limit).all()
+    return todos
 
 
 def create_user_todo(db: Session, todo: app.schemas.todo.ToDoCreate, user_id: int):

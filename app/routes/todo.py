@@ -23,9 +23,22 @@ def create_user_todo(
 
 @router.get("/", response_model=list[app.schemas.todo.ToDo])
 def read_user_todos(
+        exclude_done: bool = False,
+        exclude_shared: bool = False,
+        skip: int = 0,
+        limit: int = 100,
+        db: Session = Depends(get_db),
         current_user: app.schemas.user.User = Depends(get_current_user)
 ):
-    todos = current_user.todos + current_user.shared_todos
+
+    todos = database.get_user_todos(
+        current_user.id,
+        db,
+        exclude_done=exclude_done,
+        exclude_shared=exclude_shared,
+        skip=skip,
+        limit=limit
+    )
     return todos
 
 

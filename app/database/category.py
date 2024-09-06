@@ -10,6 +10,17 @@ def get_category(db: Session, category_id: int):
     return db.query(app.models.category).filter(app.models.category.id == category_id).first()
 
 
+def get_user_categories(
+        db: Session,
+        user_id: int,
+        skip: int = 0,
+        limit: int = 100,
+):
+    query = db.query(app.models.category.Category).filter(app.models.category.Category.user_id == user_id)
+
+    todos = query.offset(skip).limit(limit).all()
+    return todos
+
 def create_user_category(db: Session, category: app.schemas.category.CategoryCreate, user_id: int):
     db_category = app.models.category.Category(**category.model_dump(), user_id=user_id)
     db.add(db_category)

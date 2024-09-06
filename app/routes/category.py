@@ -22,9 +22,13 @@ def create_user_category(
 
 @router.get("/", response_model=list[app.schemas.category.Category])
 def read_user_categories(
-        current_user: app.schemas.user.User = Depends(get_current_user)
+        current_user: app.schemas.user.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+        skip: int = 0,
+        limit: int = 100,
 ):
-    return current_user.categories
+    categories = database.get_user_categories(db, current_user.id, skip=skip, limit=limit)
+    return categories
 
 
 @router.delete("/{category_id}")

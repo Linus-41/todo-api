@@ -89,4 +89,7 @@ def change_user_todo_position(
         db: Session = Depends(get_db),
         current_user: app.schemas.user.User = Depends(get_current_user),
 ):
+    if todo_id not in [todo.id for todo in current_user.todos]:
+        raise HTTPException(status_code=404, detail="Todo was not found")
+
     return database.update_todo_position(db, todo_id, todo.new_position)

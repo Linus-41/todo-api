@@ -3,6 +3,8 @@
 This project contains a REST API used for managing ToDos.
 
 ## Pre-requirements 
+
+### .env file 
 Before installing dependencies a ``.env`` file has to be prepared 
 - Required env variables:
   - SECRET_KEY - Used for creating access tokens 
@@ -10,6 +12,9 @@ Before installing dependencies a ``.env`` file has to be prepared
 For demo purposes the provided ``.env.example`` can be used.
 
 Therefore use command: ``cp .env.example .env``
+
+### Poetry
+Install poetry if not already installed: [installation guide ](https://python-poetry.org/docs/#installation)
 
 ## Running the API
 

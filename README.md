@@ -28,3 +28,7 @@ To see all given endpoints visit: http://127.0.0.1:8000/docs
 
 In order to use ToDo endpoints you first have to create a user
 and authorize using the users credentials.
+
+## Notes
+
+- OAuth2 is used to keep the routes secure

@@ -6,7 +6,6 @@ from fastapi import HTTPException
 import app.models.todo
 import app.models.user
 import app.schemas.todo
-from app import schemas
 from app.database.category import get_category
 
 

@@ -3,9 +3,8 @@ from sqlalchemy.orm import Session
 
 import app.schemas.todo
 import app.schemas.user
-from app import schemas
 from app.database.db import get_db
-from app.database import todo as database
+import app.database.todo
 from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/todos", tags=["todos"])
@@ -18,7 +17,7 @@ def create_user_todo(
         current_user: app.schemas.user.User = Depends(get_current_user)
 ):
 
-    return database.create_user_todo(db=db, todo=todo, user_id=current_user.id)
+    return app.database.todo.create_user_todo(db=db, todo=todo, user_id=current_user.id)
 
 
 @router.get("/", response_model=list[app.schemas.todo.ToDo])
@@ -31,7 +30,7 @@ def read_user_todos(
         current_user: app.schemas.user.User = Depends(get_current_user)
 ):
 
-    todos = database.get_user_todos(
+    todos = app.database.todo.get_user_todos(
         current_user.id,
         db,
         exclude_done=exclude_done,
@@ -53,7 +52,7 @@ def delete_user_todo(
     if todo_id not in [todo.id for todo in current_user.todos]:
         raise HTTPException(status_code=404, detail="Todo was not found")
 
-    database.delete_todo(db, todo_id)
+    app.database.todo.delete_todo(db, todo_id)
     response.status_code = status.HTTP_204_NO_CONTENT
 
 
@@ -66,7 +65,7 @@ def update_user_todo(
     if todo.id not in [todo.id for todo in current_user.todos]:
         raise HTTPException(status_code=404, detail="Todo was not found")
 
-    return database.update_todo(db, todo)
+    return app.database.todo.update_todo(db, todo)
 
 
 @router.patch("/{todo_id}/toggle_status", response_model=app.schemas.todo.ToDo)
@@ -78,7 +77,7 @@ def toggle_todo_status(
     if todo_id not in [todo.id for todo in current_user.todos]:
         raise HTTPException(status_code=404, detail="Todo was not found")
 
-    return database.toggle_todo_status(db, todo_id)
+    return app.database.todo.toggle_todo_status(db, todo_id)
 
 
 @router.post("/{todo_id}/share", response_model=app.schemas.todo.ToDo)
@@ -88,21 +87,21 @@ def share_todo(
         db: Session = Depends(get_db),
         current_user: app.schemas.user.User = Depends(get_current_user),
 ):
-    db_todo = database.get_todo_by_id(db, todo_id)
+    db_todo = app.database.todo.get_todo_by_id(db, todo_id)
     if db_todo.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to share this ToDo")
 
-    return database.share_todo_with_user(db, todo_id, share_request.user_id)
+    return app.database.todo.share_todo_with_user(db, todo_id, share_request.user_id)
 
 
 @router.patch("/{todo_id}/change_position")
 def change_user_todo_position(
         todo_id: int,
-        todo: schemas.todo.ToDoUpdatePosition,
+        todo: app.schemas.todo.ToDoUpdatePosition,
         db: Session = Depends(get_db),
         current_user: app.schemas.user.User = Depends(get_current_user),
 ):
     if todo_id not in [todo.id for todo in current_user.todos]:
         raise HTTPException(status_code=404, detail="Todo was not found")
 
-    return database.update_todo_position(db, todo_id, todo.new_position)
+    return app.database.todo.update_todo_position(db, todo_id, todo.new_position)

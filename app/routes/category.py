@@ -3,9 +3,8 @@ from sqlalchemy.orm import Session
 
 import app.schemas.category
 import app.schemas.user
-from app import schemas
 from app.database.db import get_db
-from app.database import category as database
+import app.database.category
 from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/categories", tags=["categories"])
@@ -17,7 +16,7 @@ def create_user_category(
         db: Session = Depends(get_db),
         current_user: app.schemas.user.User = Depends(get_current_user)
 ):
-    return database.create_user_category(db=db, category=category, user_id=current_user.id)
+    return app.database.category.create_user_category(db=db, category=category, user_id=current_user.id)
 
 
 @router.get("/", response_model=list[app.schemas.category.Category])
@@ -27,7 +26,7 @@ def read_user_categories(
         skip: int = 0,
         limit: int = 100,
 ):
-    categories = database.get_user_categories(db, current_user.id, skip=skip, limit=limit)
+    categories = app.database.category.get_user_categories(db, current_user.id, skip=skip, limit=limit)
     return categories
 
 
@@ -42,7 +41,7 @@ def delete_user_category(
     if category_id not in [category.id for category in current_user.categories]:
         raise HTTPException(status_code=404, detail="Category was not found")
 
-    database.delete_category(db, category_id)
+    app.database.category.delete_category(db, category_id)
     response.status_code = status.HTTP_204_NO_CONTENT
 
 
@@ -55,4 +54,4 @@ def update_user_category(
     if category.id not in [category.id for category in current_user.categories]:
         raise HTTPException(status_code=404, detail="Category was not found")
 
-    return database.update_category(db, category)
+    return app.database.category.update_category(db, category)

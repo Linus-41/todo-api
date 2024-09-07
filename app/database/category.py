@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 import app.models.category
 import app.schemas.category
-from app import schemas
 
 
 def get_category(db: Session, category_id: int):
@@ -20,6 +19,7 @@ def get_user_categories(
 
     todos = query.offset(skip).limit(limit).all()
     return todos
+
 
 def create_user_category(db: Session, category: app.schemas.category.CategoryCreate, user_id: int):
     db_category = app.models.category.Category(**category.model_dump(), user_id=user_id)

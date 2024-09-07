@@ -79,9 +79,9 @@ def update_todo(db: Session, todo: app.schemas.todo.ToDoUpdate):
     return db_todo
 
 
-def mark_todo_done(db: Session, todo_id: int):
+def toggle_todo_status(db: Session, todo_id: int):
     db_todo = db.query(app.models.todo.ToDo).filter(app.models.todo.ToDo.id == todo_id).first()
-    db_todo.is_done = True
+    db_todo.is_done = not db_todo.is_done
     db.commit()
     db.refresh(db_todo)
     return db_todo

@@ -69,8 +69,8 @@ def update_user_todo(
     return database.update_todo(db, todo)
 
 
-@router.patch("/{todo_id}/mark_done", response_model=app.schemas.todo.ToDo)
-def mark_user_todo_done(
+@router.patch("/{todo_id}/toggle_status", response_model=app.schemas.todo.ToDo)
+def toggle_todo_status(
     todo_id: int,
     db: Session = Depends(get_db),
     current_user: app.schemas.user.User = Depends(get_current_user)
@@ -78,7 +78,7 @@ def mark_user_todo_done(
     if todo_id not in [todo.id for todo in current_user.todos]:
         raise HTTPException(status_code=404, detail="Todo was not found")
 
-    return database.mark_todo_done(db, todo_id)
+    return database.toggle_todo_status(db, todo_id)
 
 
 @router.post("/{todo_id}/share", response_model=app.schemas.todo.ToDo)

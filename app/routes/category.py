@@ -10,6 +10,7 @@ from app.dependencies import get_current_user
 router = APIRouter(prefix="/categories", tags=["categories"])
 
 
+# create a category for the current user
 @router.post("/", response_model=app.schemas.category.Category)
 def create_user_category(
         category: app.schemas.category.CategoryCreate,
@@ -19,6 +20,7 @@ def create_user_category(
     return app.database.category.create_user_category(db=db, category=category, user_id=current_user.id)
 
 
+# get all user categories
 @router.get("/", response_model=list[app.schemas.category.Category])
 def read_user_categories(
         current_user: app.schemas.user.User = Depends(get_current_user),
@@ -30,6 +32,7 @@ def read_user_categories(
     return categories
 
 
+# delete a specific user category
 @router.delete("/{category_id}")
 def delete_user_category(
         category_id: int,
@@ -45,6 +48,7 @@ def delete_user_category(
     response.status_code = status.HTTP_204_NO_CONTENT
 
 
+# update a user category
 @router.put("/")
 def update_user_category(
         category: app.schemas.category.CategoryUpdate,

@@ -5,6 +5,7 @@ from app.database.db import Base
 from app.models.user import user_todo_share_association
 
 
+# todo model for persisting
 class ToDo(Base):
     __tablename__ = "todo"
 

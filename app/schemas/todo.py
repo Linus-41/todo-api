@@ -8,15 +8,18 @@ class ToDoBase(BaseModel):
     category_id: int | None = None
 
 
+# Schema to create todos
 class ToDoCreate(ToDoBase):
     pass
 
 
+# Schema to update todos
 class ToDoUpdate(ToDoBase):
     title: str | None = None
     id: int
 
 
+# Schema for complete todos e.g. for fetching
 class ToDo(ToDoBase):
     id: int
     owner_id: int
@@ -26,5 +29,6 @@ class ToDo(ToDoBase):
         from_attributes = True
 
 
+# Schema to update todo position
 class ToDoUpdatePosition(BaseModel):
     new_position: int

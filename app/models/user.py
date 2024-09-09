@@ -3,6 +3,9 @@ from sqlalchemy.orm import relationship
 
 from app.database.db import Base
 
+
+# table for associations between user and todo
+# for many-to-many relationship for shared todos
 user_todo_share_association = Table(
     'user_todo_share_association',
     Base.metadata,
@@ -11,6 +14,7 @@ user_todo_share_association = Table(
 )
 
 
+# user model for persisting
 class User(Base):
     __tablename__ = "user"
 

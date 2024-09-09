@@ -12,14 +12,17 @@ ACCESS_TOKEN_EXPIRES = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
+# verify a hashed password matches an unhashed password
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
+# get hash for a password
 def get_password_hash(password):
     return pwd_context.hash(password)
 
 
+# create access token for authorization including time for token to expire
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))

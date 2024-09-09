@@ -5,10 +5,12 @@ import app.models.category
 import app.schemas.category
 
 
+# fetch a category by id
 def get_category(db: Session, category_id: int):
     return db.query(app.models.category).filter(app.models.category.id == category_id).first()
 
 
+# fetch all categories for specific user
 def get_user_categories(
         db: Session,
         user_id: int,
@@ -21,6 +23,7 @@ def get_user_categories(
     return todos
 
 
+# create new category for user
 def create_user_category(db: Session, category: app.schemas.category.CategoryCreate, user_id: int):
     db_category = app.models.category.Category(**category.model_dump(), user_id=user_id)
     db.add(db_category)
@@ -29,6 +32,7 @@ def create_user_category(db: Session, category: app.schemas.category.CategoryCre
     return db_category
 
 
+# delete specific category of a user
 def delete_category(db: Session, category_id: int):
     category = db.query(app.models.category.Category).filter(app.models.category.Category.id == category_id).first()
     if category:
@@ -36,6 +40,7 @@ def delete_category(db: Session, category_id: int):
         db.commit()
 
 
+# update specific category of a user
 def update_category(db: Session, category: app.schemas.category.CategoryUpdate):
     db_category = db.query(app.models.category.Category).filter(app.models.category.Category.id == category.id).first()
     if not db_category:

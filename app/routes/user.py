@@ -9,6 +9,7 @@ from app.dependencies import get_current_user
 router = APIRouter(prefix="/user", tags=["user"])
 
 
+# create new user
 @router.post("/", response_model=app.schemas.user.User)
 def create_user(user: app.schemas.user.UserCreate, db: Session = Depends(get_db)):
     db_user = app.database.user.get_user_by_username(db, user_name=user.user_name)
@@ -17,6 +18,7 @@ def create_user(user: app.schemas.user.UserCreate, db: Session = Depends(get_db)
     return app.database.user.create_user(db=db, user=user)
 
 
+# fetch current logged in user
 @router.get("/me", response_model=app.schemas.user.User)
 def read_current_user(
         current_user: app.schemas.user.User = Depends(get_current_user)

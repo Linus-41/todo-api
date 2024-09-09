@@ -9,8 +9,10 @@ from app.database.db import engine
 
 app = FastAPI()
 
+# create all database tables
 db.Base.metadata.create_all(bind=engine)
 
+# add routers
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(todo.router)

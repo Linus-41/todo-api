@@ -11,6 +11,7 @@ from app.security import ACCESS_TOKEN_EXPIRES, create_access_token, verify_passw
 router = APIRouter()
 
 
+# Authenticate user by checking if he exists and if password is valid
 def authenticate_user(db: Session, username: str, password: str):
     user = app.database.user.get_user_by_username(db, username)
     if not user or not verify_password(password, user.hashed_password):
@@ -18,6 +19,7 @@ def authenticate_user(db: Session, username: str, password: str):
     return user
 
 
+# Route to authorize and get access token
 @router.post("/token", response_model=Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)

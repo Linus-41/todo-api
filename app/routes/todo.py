@@ -10,6 +10,7 @@ from app.dependencies import get_current_user
 router = APIRouter(prefix="/todos", tags=["todos"])
 
 
+# create a todo for the current user
 @router.post("/", response_model=app.schemas.todo.ToDo)
 def create_user_todo(
         todo: app.schemas.todo.ToDoCreate,
@@ -20,6 +21,9 @@ def create_user_todo(
     return app.database.todo.create_user_todo(db=db, todo=todo, user_id=current_user.id)
 
 
+# get all user todos
+# including filter options for status and if todo is shared.
+# also including options skip and limit for pagination
 @router.get("/", response_model=list[app.schemas.todo.ToDo])
 def read_user_todos(
         exclude_done: bool = False,
@@ -41,6 +45,7 @@ def read_user_todos(
     return todos
 
 
+# delete specific user todo
 @router.delete("/{todo_id}")
 def delete_user_todo(
         todo_id: int,
@@ -56,6 +61,7 @@ def delete_user_todo(
     response.status_code = status.HTTP_204_NO_CONTENT
 
 
+# update a specific user todo
 @router.put("/", response_model=app.schemas.todo.ToDo)
 def update_user_todo(
     todo: app.schemas.todo.ToDoUpdate,
@@ -68,6 +74,7 @@ def update_user_todo(
     return app.database.todo.update_todo(db, todo)
 
 
+# todo status (if done or not) of a specific todo
 @router.patch("/{todo_id}/toggle_status", response_model=app.schemas.todo.ToDo)
 def toggle_todo_status(
     todo_id: int,
@@ -80,6 +87,7 @@ def toggle_todo_status(
     return app.database.todo.toggle_todo_status(db, todo_id)
 
 
+# share a todo to another user
 @router.post("/{todo_id}/share", response_model=app.schemas.todo.ToDo)
 def share_todo(
         todo_id: int,
@@ -94,6 +102,7 @@ def share_todo(
     return app.database.todo.share_todo_with_user(db, todo_id, share_request.user_id)
 
 
+# change position of a todo
 @router.patch("/{todo_id}/change_position")
 def change_user_todo_position(
         todo_id: int,

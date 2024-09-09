@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from app.database.db import Base
 
 
+# category model for persisting
 class Category(Base):
     __tablename__ = "category"
 

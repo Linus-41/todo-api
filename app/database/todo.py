@@ -9,10 +9,14 @@ import app.schemas.todo
 from app.database.category import get_category
 
 
+# fetch todo by id
 def get_todo_by_id(db: Session, todo_id: int):
     return db.query(app.models.todo.ToDo).filter(app.models.todo.ToDo.id == todo_id).first()
 
 
+# fetch all todos for user
+# with options to filter for status and if shared todos should be excluded
+# also options for pagination
 def get_user_todos(
         owner_id: int,
         db: Session,
@@ -33,6 +37,7 @@ def get_user_todos(
     return todos
 
 
+# create new todo for user
 def create_user_todo(db: Session, todo: app.schemas.todo.ToDoCreate, user_id: int):
     # Validate category ownership
     if todo.category_id is not None:
@@ -52,6 +57,7 @@ def create_user_todo(db: Session, todo: app.schemas.todo.ToDoCreate, user_id: in
     return db_todo
 
 
+# delete specific todo by id
 def delete_todo(db: Session, todo_id: int):
     db_todo = db.query(app.models.todo.ToDo).filter(app.models.todo.ToDo.id == todo_id).first()
     db.delete(db_todo)
@@ -59,6 +65,7 @@ def delete_todo(db: Session, todo_id: int):
     return db_todo
 
 
+# update specific todo by id
 def update_todo(db: Session, todo: app.schemas.todo.ToDoUpdate):
     db_todo = db.query(app.models.todo.ToDo).filter(app.models.todo.ToDo.id == todo.id).first()
     if not db_todo:
@@ -78,6 +85,7 @@ def update_todo(db: Session, todo: app.schemas.todo.ToDoUpdate):
     return db_todo
 
 
+# toggle status (done or not) of a specific todo
 def toggle_todo_status(db: Session, todo_id: int):
     db_todo = db.query(app.models.todo.ToDo).filter(app.models.todo.ToDo.id == todo_id).first()
     db_todo.is_done = not db_todo.is_done
@@ -86,6 +94,7 @@ def toggle_todo_status(db: Session, todo_id: int):
     return db_todo
 
 
+# create share relationship between a todo and the user it is shared to
 def share_todo_with_user(db: Session, todo_id: int, user_id: int):
     db_todo = db.query(app.models.todo.ToDo).filter(app.models.todo.ToDo.id == todo_id).first()
     db_user = db.query(app.models.user.User).filter(app.models.user.User.id == user_id).first()
@@ -103,6 +112,9 @@ def share_todo_with_user(db: Session, todo_id: int, user_id: int):
     return db_todo
 
 
+# update todo position
+# logic to keep all user todos valid also implemented here
+# if a user changes the position of a todo, positions of all other todos get updated accordingly
 def update_todo_position(db: Session, todo_id: int, new_position: int):
     db_todo = db.query(app.models.todo.ToDo).filter(app.models.todo.ToDo.id == todo_id).first()
     if not db_todo:

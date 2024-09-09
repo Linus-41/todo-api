@@ -8,10 +8,12 @@ class UserBase(BaseModel):
     user_name: str
 
 
+# Schema to create a user
 class UserCreate(UserBase):
     password: str
 
 
+# Schema of complete user
 class User(UserBase):
     id: int
     todos: list[ToDo] = []
@@ -22,5 +24,6 @@ class User(UserBase):
         from_attributes = True
 
 
+# Schema to share a todo
 class ShareToDoRequest(BaseModel):
     user_id: int

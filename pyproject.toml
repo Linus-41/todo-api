@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "API for managing ToDos"
 authors = ["Linus Widing <l.widing@web.de>"]
 readme = "README.md"
+packages = [
+    { include = "app" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.12"

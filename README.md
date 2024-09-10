@@ -21,7 +21,7 @@ Install poetry if not already installed: [installation guide ](https://python-po
 - Dependencies are managed using poetry. To install all packages run:
   - ``poetry install``
 - To run the API:
-  - ``poetry run fastapi dev app/main.py``
+  - ``poetry run fastapi run app/main.py``
   - Working directory should be /todo-api
   
 To see all given endpoints visit: http://127.0.0.1:8000/docs
